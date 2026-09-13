@@ -1,0 +1,67 @@
+# ==============================================================================
+# kirialsd configuration file
+# Ambient Light Sensor Backlight Daemon
+# Default location: ~/.config/kirialsd/config.toml
+# ==============================================================================
+
+# Reference ambient light points (in lux) used to construct the interpolation curve.
+# Default values cover dark rooms (0-15 lx) up to bright daylight (1000 lx).
+lux_points = [0.0, 15.0, 35.0, 70.0, 100.0, 300.0, 600.0, 1000.0]
+
+# Maximum lux on the calibration curve.
+# Optional: if omitted or commented out, automatically uses the last element of lux_points.
+# max_lux = 1000.0
+
+# Relative hysteresis threshold (0.15 = 15%).
+# Change in lux relative to current target must exceed this ratio to initiate readjustment.
+lux_hysteresis_ratio = 0.15
+
+# Absolute hysteresis threshold (in lux).
+# Prevents small sensor noise fluctuations from triggering brightness shifts in low-light.
+lux_hysteresis_abs = 5.0
+
+# Hold delay in milliseconds.
+# Ambient light must stay past the hysteresis band continuously for this duration
+# before the daemon starts adjusting the display (filters out transient shadows).
+auto_adjust_delay_ms = 1000
+
+# Total duration of the smoothstep transition animation in milliseconds.
+# Represents the base/maximum transition duration for full brightness sweeps.
+transition_duration_ms = 1500
+
+# Minimum transition duration in milliseconds when adaptive scaling is enabled.
+# Prevents micro-steps (e.g. 1-2 brightness levels) from taking the full transition time.
+min_transition_duration_ms = 200
+
+# Whether transition animation duration scales adaptively with the step size.
+# True: small brightness adjustments finish swiftly, large adjustments transition smoothly over full duration.
+adaptive_transition = true
+
+# Minimum allowed screen brightness percentage (0.0 - 100.0).
+# Prevents the screen from going completely pitch-black in dark environments.
+min_brightness_percent = 2.0
+
+# Maximum allowed screen brightness percentage (0.0 - 100.0).
+max_brightness_percent = 100.0
+
+# Shutter threshold (0.05 = 5%).
+# Minimum difference between expected curve brightness and manual user brightness
+# required to register a user calibration point.
+shutter_threshold = 0.05
+
+# Enable curve learning on daemon startup.
+# Can be toggled at runtime by sending SIGUSR1 signal.
+default_learning = true
+
+# Enable automatic brightness adjustment on daemon startup.
+# Can be toggled at runtime by sending SIGUSR2 signal.
+default_adjust_enabled = true
+
+# Specific backlight controller name in /sys/class/backlight (e.g. "intel_backlight", "amdgpu_bl0").
+# Optional: if omitted or commented out, auto-detects the best GPU controller.
+# backlight_device = "intel_backlight"
+
+# Periodic sensor polling interval in milliseconds (e.g. 1000).
+# Set to -1 to disable active periodic polling and rely solely on D-Bus PropertiesChanged signals.
+poll_interval_ms = 1000
+

@@ -1,0 +1,21 @@
+[Unit]
+Description=kirialsd - Ambient Light Sensor Backlight Daemon
+Documentation=https://github.com/semyon0101/als-daemon
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.cargo/bin/kirialsd
+Restart=on-failure
+RestartSec=3
+KillMode=mixed
+
+# Optional sandbox hardening
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.config/kirialsd %h/.local/state/kirialsd
+PrivateTmp=true
+
+[Install]
+WantedBy=graphical-session.target
