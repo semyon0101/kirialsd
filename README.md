@@ -111,23 +111,22 @@ cargo build --release
 install -Dm755 target/release/kirialsd ~/.cargo/bin/kirialsd
 ```
 
-### 2. Backlight Permissions (udev)
+### 2. Permissions & Backlight Access
 
-To allow `kirialsd` to write to `/sys/class/backlight/` without requiring root privileges:
+- **Standard Linux with systemd (Default):**  
+  **No extra permissions, root access, or `video` group membership are required!**  
+  `kirialsd` automatically controls backlight brightness out-of-the-box through the unprivileged `org.freedesktop.login1.Session.SetBrightness` D-Bus API provided by `systemd-logind` for your active user session.
 
-```bash
-sudo tee /etc/udev/rules.d/90-backlight.rules << 'EOF'
-ACTION=="add", SUBSYSTEM=="backlight", RUN+="/bin/chgrp video /sys/class/backlight/%k/brightness", RUN+="/bin/chmod g+w /sys/class/backlight/%k/brightness"
-EOF
+- **Optional Fallback (Non-systemd / minimal inits / elogind):**  
+  If your system runs without `systemd-logind`, you can configure direct `sysfs` write access via a `udev` rule:
+  ```bash
+  sudo tee /etc/udev/rules.d/90-backlight.rules << 'EOF'
+  ACTION=="add", SUBSYSTEM=="backlight", RUN+="/bin/chgrp video /sys/class/backlight/%k/brightness", RUN+="/bin/chmod g+w /sys/class/backlight/%k/brightness"
+  EOF
 
-sudo udevadm control --reload-rules && sudo udevadm trigger
-```
-
-Ensure your user belongs to the `video` group:
-```bash
-sudo usermod -aG video "$USER"
-```
-*(Log out and log back in for group membership to take effect).*
+  sudo udevadm control --reload-rules && sudo udevadm trigger
+  sudo usermod -aG video "$USER"
+  ```
 
 ### 3. Running as a Systemd Service
 
